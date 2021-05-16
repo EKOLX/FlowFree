@@ -4,5 +4,6 @@ using UnityEngine;
 
 public class Slot : MonoBehaviour
 {
+    public int groupNumber = 0;
     public bool isEmpty = true;
 }

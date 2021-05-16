@@ -1,9 +1,16 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class LineDrawer : MonoBehaviour
 {
     [SerializeField] private GameObject toucherObject = default;
-    [SerializeField] private Canvas canvas = default;
+    [SerializeField] private GameObject uiCanvas = default;
+
+    private GraphicRaycaster raycaster;
+    private PointerEventData pointerEventData;
+    private EventSystem eventSystem;
 
     private RectTransform toucherRectTransform = default;
     private CanvasGroup toucherCanvasGroup = default;
@@ -15,8 +22,13 @@ public class LineDrawer : MonoBehaviour
     {
         toucherRectTransform = toucherObject.GetComponent<RectTransform>();
         toucherCanvasGroup = toucherObject.GetComponent<CanvasGroup>();
+        raycaster = uiCanvas.GetComponent<GraphicRaycaster>();
+        eventSystem = uiCanvas.GetComponent<EventSystem>();
         lineRenderer = GetComponent<LineRenderer>();
+    }
 
+    private void Start()
+    {
         lineRenderer.positionCount = 2;
     }
 
@@ -39,6 +51,25 @@ public class LineDrawer : MonoBehaviour
             lineRenderer.SetPosition(1, new Vector3(mousePosition.x, mousePosition.y, 0));
 
             toucherRectTransform.position = mousePosition;
+
+            pointerEventData = new PointerEventData(eventSystem);
+            pointerEventData.position = Input.mousePosition;
+
+            List<RaycastResult> results = new List<RaycastResult>();
+            raycaster.Raycast(pointerEventData, results);
+
+            foreach (RaycastResult result in results)
+            {
+                if (result.gameObject.name.Contains(K.slot))
+                {
+                    Slot slot = result.gameObject.GetComponent<Slot>();
+                    if (slot.isEmpty)
+                    {
+                        print("Drawing...");
+                        slot.isEmpty = false;
+                    }
+                }
+            }
         }
 
         if (Input.GetMouseButtonUp(0))
