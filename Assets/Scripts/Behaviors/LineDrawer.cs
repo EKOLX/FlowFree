@@ -17,6 +17,7 @@ public class LineDrawer : MonoBehaviour
     private LineRenderer lineRenderer = default;
     private Vector2 mousePosition = default;
     private Vector2 mousePositionStart = default;
+    private List<RaycastResult> raycastResult = new List<RaycastResult>();
 
     private void Awake()
     {
@@ -29,7 +30,8 @@ public class LineDrawer : MonoBehaviour
 
     private void Start()
     {
-        lineRenderer.positionCount = 2;
+        lineRenderer.positionCount = 0;
+        pointerEventData = new PointerEventData(eventSystem);
     }
 
     private void Update()
@@ -38,35 +40,45 @@ public class LineDrawer : MonoBehaviour
         {
             mousePositionStart = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            lineRenderer.SetPosition(0, new Vector3(mousePositionStart.x, mousePositionStart.y, 0));
-
             toucherRectTransform.position = mousePositionStart;
             toucherCanvasGroup.alpha = 0.6f;
+
+            CastRays();
+
+            print($"RaycastResultCount: {raycastResult.Count}");
+            foreach (RaycastResult result in raycastResult)
+            {
+                if (result.gameObject.name.Contains(K.slot))
+                {
+                    Slot slot = result.gameObject.GetComponent<Slot>();
+                    if (slot.isDrawn)
+                    {
+                        lineRenderer.SetPosition(lineRenderer.positionCount++, new Vector3(mousePositionStart.x, mousePositionStart.y, 0));
+                        lineRenderer.SetColors(slot.color, slot.color);
+                    }
+                }
+            }
         }
 
         if (Input.GetMouseButton(0))
         {
             mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            lineRenderer.SetPosition(1, new Vector3(mousePosition.x, mousePosition.y, 0));
-
             toucherRectTransform.position = mousePosition;
 
-            pointerEventData = new PointerEventData(eventSystem);
-            pointerEventData.position = Input.mousePosition;
+            CastRays();
 
-            List<RaycastResult> results = new List<RaycastResult>();
-            raycaster.Raycast(pointerEventData, results);
-
-            foreach (RaycastResult result in results)
+            foreach (RaycastResult result in raycastResult)
             {
                 if (result.gameObject.name.Contains(K.slot))
                 {
                     Slot slot = result.gameObject.GetComponent<Slot>();
-                    if (slot.isEmpty)
+                    if (!slot.isDrawn)
                     {
-                        print("Drawing...");
-                        slot.isEmpty = false;
+                        lineRenderer.SetPosition(lineRenderer.positionCount++, new Vector3(mousePosition.x, mousePosition.y, 0));
+                        slot.isDrawn = true;
+                        slot.color = lineRenderer.endColor;
+                        print(slot.index);
                     }
                 }
             }
@@ -75,9 +87,14 @@ public class LineDrawer : MonoBehaviour
         if (Input.GetMouseButtonUp(0))
         {
             toucherCanvasGroup.alpha = 0.0f;
-            lineRenderer.SetPosition(1, new Vector3(mousePositionStart.x, mousePositionStart.y, 0));
 
         }
+    }
+
+    private void CastRays()
+    {
+        pointerEventData.position = Input.mousePosition;
+        raycaster.Raycast(pointerEventData, raycastResult);
     }
 
 }

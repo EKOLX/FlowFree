@@ -53,25 +53,32 @@ public class GridControl : MonoBehaviour
 
         List<Color32> colors = GenerateColors();
 
+        int counter = 0;
         for (int x = 0; x < level.GetLength(0); x++)
         {
             for (int y = 0; y < level.GetLength(1); y++)
             {
                 GameObject slotObject = Instantiate(slotPrefab, transform);
+                slotObject.name = $"{K.slot}{++counter}";
+
                 int groupNumber = level[x, y];
-                slotObject.name = $"{K.slot}{groupNumber}";
+
                 Slot slot = slotObject.GetComponent<Slot>();
+                slot.index = counter;
                 slot.groupNumber = groupNumber;
+
                 if (groupNumber > 0)
                 {
-                    slot.isEmpty = false;
+                    slot.isDrawn = true;
                     GameObject connector = Instantiate(connectorPrefab, slotObject.transform);
                     connector.name = $"Connector{groupNumber}";
 
                     if (!colorGroup.ContainsKey(groupNumber))
                     {
                         int randomIndex = Random.Range(0, colors.Count);
-                        colorGroup.Add(groupNumber, colors[randomIndex]);
+                        Color32 color = colors[randomIndex];
+                        colorGroup.Add(groupNumber, color);
+                        slot.color = color;
                         colors.RemoveAt(randomIndex);
                     }
 

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Slot : MonoBehaviour
 {
+    public int index;
     public int groupNumber = 0;
-    public bool isEmpty = true;
+    public bool isDrawn = false;
+    public Color32 color;
 }
