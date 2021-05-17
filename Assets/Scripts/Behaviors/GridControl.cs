@@ -69,7 +69,7 @@ public class GridControl : MonoBehaviour
 
                 if (groupNumber > 0)
                 {
-                    slot.isDrawn = true;
+                    slot.isStarter = true;
                     GameObject connector = Instantiate(connectorPrefab, slotObject.transform);
                     connector.name = $"Connector{groupNumber}";
 

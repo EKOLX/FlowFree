@@ -51,10 +51,11 @@ public class LineDrawer : MonoBehaviour
                 if (result.gameObject.name.Contains(K.slot))
                 {
                     Slot slot = result.gameObject.GetComponent<Slot>();
-                    if (slot.isDrawn)
+                    if (slot.isStarter)
                     {
-                        lineRenderer.SetPosition(lineRenderer.positionCount++, new Vector3(mousePositionStart.x, mousePositionStart.y, 0));
                         lineRenderer.SetColors(slot.color, slot.color);
+                        DrawLine(result.gameObject);
+                        slot.isStarter = false;
                     }
                 }
             }
@@ -75,7 +76,7 @@ public class LineDrawer : MonoBehaviour
                     Slot slot = result.gameObject.GetComponent<Slot>();
                     if (!slot.isDrawn)
                     {
-                        lineRenderer.SetPosition(lineRenderer.positionCount++, new Vector3(mousePosition.x, mousePosition.y, 0));
+                        DrawLine(result.gameObject);
                         slot.isDrawn = true;
                         slot.color = lineRenderer.endColor;
                         print(slot.index);
@@ -88,6 +89,16 @@ public class LineDrawer : MonoBehaviour
         {
             toucherCanvasGroup.alpha = 0.0f;
 
+            CastRays();
+
+            foreach (RaycastResult result in raycastResult)
+            {
+                if (result.gameObject.name.Contains(K.slot))
+                {
+                    Slot slot = result.gameObject.GetComponent<Slot>();
+                    slot.isStarter = true;
+                }
+            }
         }
     }
 
@@ -95,6 +106,13 @@ public class LineDrawer : MonoBehaviour
     {
         pointerEventData.position = Input.mousePosition;
         raycaster.Raycast(pointerEventData, raycastResult);
+    }
+
+    private void DrawLine(GameObject basedOnObject)
+    {
+        RectTransform slotTransform = basedOnObject.GetComponent<RectTransform>();
+        lineRenderer.SetPosition(lineRenderer.positionCount++,
+            new Vector3(slotTransform.position.x, slotTransform.position.y, 0));
     }
 
 }
