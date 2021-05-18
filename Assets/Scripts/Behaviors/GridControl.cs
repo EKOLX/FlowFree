@@ -10,6 +10,7 @@ public class GridControl : MonoBehaviour
     [Header("Editor")]
     [SerializeField] private bool isPortrait; // TODO: Temp for editor
 
+    private GameObject[] slotObjects;
     private GridLayoutGroup gridLayout = default;
     private FileManager fileManager;
     private float width, height;
@@ -27,9 +28,31 @@ public class GridControl : MonoBehaviour
         CreateGrid(4);
     }
 
+    private IEnumerator Start()
+    {
+        yield return null;
+
+        foreach (GameObject childObject in slotObjects)
+        {
+            Vector2 slotSize = childObject.GetComponent<RectTransform>().sizeDelta;
+
+            foreach (Transform child in childObject.transform)
+            {
+                if (child.gameObject.tag.Equals(K.slot))
+                {
+                    child.gameObject.GetComponent<RectTransform>().sizeDelta =
+                        new Vector2(slotSize.x / 2, slotSize.y / 2);
+                }
+            }
+        }
+    }
+
     private void CreateGrid(int size)
     {
         level = fileManager.ReadLevel(size);
+
+        int cellsCount = (int)Mathf.Pow(size, 2);
+        slotObjects = new GameObject[cellsCount];
 
         // TODO: Refactoring into chunks
 
@@ -59,7 +82,8 @@ public class GridControl : MonoBehaviour
             for (int y = 0; y < level.GetLength(1); y++)
             {
                 GameObject slotObject = Instantiate(slotPrefab, transform);
-                slotObject.name = $"{K.slot}{++counter}";
+                slotObjects[counter++] = slotObject;
+                slotObject.name = $"{K.slot}{counter}";
 
                 int groupNumber = level[x, y];
 
@@ -70,8 +94,8 @@ public class GridControl : MonoBehaviour
                 if (groupNumber > 0)
                 {
                     slot.isStarter = true;
-                    GameObject connector = Instantiate(connectorPrefab, slotObject.transform);
-                    connector.name = $"Connector{groupNumber}";
+                    GameObject connectorObject = Instantiate(connectorPrefab, slotObject.transform);
+                    connectorObject.name = $"Connector{groupNumber}";
 
                     if (!colorGroup.ContainsKey(groupNumber))
                     {
@@ -82,7 +106,7 @@ public class GridControl : MonoBehaviour
                         colors.RemoveAt(randomIndex);
                     }
 
-                    connector.GetComponent<Image>().color = colorGroup[groupNumber];
+                    connectorObject.GetComponent<Image>().color = colorGroup[groupNumber];
                 }
             }
         }

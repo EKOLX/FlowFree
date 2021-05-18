@@ -14,7 +14,8 @@ public class LineDrawer : MonoBehaviour
 
     private RectTransform toucherRectTransform = default;
     private CanvasGroup toucherCanvasGroup = default;
-    private LineRenderer lineRenderer = default;
+    private Color32 currentColor = default;
+    //private LineRenderer lineRenderer = default;
     private Vector2 mousePosition = default;
     private Vector2 mousePositionStart = default;
     private List<RaycastResult> raycastResult = new List<RaycastResult>();
@@ -25,12 +26,12 @@ public class LineDrawer : MonoBehaviour
         toucherCanvasGroup = toucherObject.GetComponent<CanvasGroup>();
         raycaster = uiCanvas.GetComponent<GraphicRaycaster>();
         eventSystem = uiCanvas.GetComponent<EventSystem>();
-        lineRenderer = GetComponent<LineRenderer>();
+        //lineRenderer = GetComponent<LineRenderer>();
     }
 
     private void Start()
     {
-        lineRenderer.positionCount = 0;
+        //lineRenderer.positionCount = 0;
         pointerEventData = new PointerEventData(eventSystem);
     }
 
@@ -45,7 +46,6 @@ public class LineDrawer : MonoBehaviour
 
             CastRays();
 
-            print($"RaycastResultCount: {raycastResult.Count}");
             foreach (RaycastResult result in raycastResult)
             {
                 if (result.gameObject.name.Contains(K.slot))
@@ -53,9 +53,10 @@ public class LineDrawer : MonoBehaviour
                     Slot slot = result.gameObject.GetComponent<Slot>();
                     if (slot.isStarter)
                     {
-                        lineRenderer.SetColors(slot.color, slot.color);
+                        currentColor = slot.color;
+                        //lineRenderer.SetColors(slot.color, slot.color);
                         DrawLine(result.gameObject);
-                        slot.isStarter = false;
+                        //slot.isStarter = false;
                     }
                 }
             }
@@ -76,10 +77,25 @@ public class LineDrawer : MonoBehaviour
                     Slot slot = result.gameObject.GetComponent<Slot>();
                     if (!slot.isDrawn)
                     {
-                        DrawLine(result.gameObject);
+                        print($"slot.index: {slot.index}");
+                        if (mousePosition.y < mousePositionStart.y) // Down
+                        {
+                            if (slot.groupNumber == 0)
+                            {
+                                GameObject upObject = result.gameObject.transform.GetChild(2).gameObject;
+                                upObject.SetActive(true);
+                                upObject.GetComponent<Image>().color = currentColor;
+                            }
+
+                            GameObject downObject = result.gameObject.transform.GetChild(3).gameObject;
+                            downObject.SetActive(true);
+                            downObject.GetComponent<Image>().color = currentColor;
+                        }
+
+
+                        //DrawLine(result.gameObject);
                         slot.isDrawn = true;
-                        slot.color = lineRenderer.endColor;
-                        print(slot.index);
+                        //slot.color = lineRenderer.endColor;
                     }
                 }
             }
@@ -111,8 +127,8 @@ public class LineDrawer : MonoBehaviour
     private void DrawLine(GameObject basedOnObject)
     {
         RectTransform slotTransform = basedOnObject.GetComponent<RectTransform>();
-        lineRenderer.SetPosition(lineRenderer.positionCount++,
-            new Vector3(slotTransform.position.x, slotTransform.position.y, 0));
+        //lineRenderer.SetPosition(lineRenderer.positionCount++,
+        //    new Vector3(slotTransform.position.x, slotTransform.position.y, 0));
     }
 
 }
