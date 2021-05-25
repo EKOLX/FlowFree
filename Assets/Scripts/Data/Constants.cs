@@ -4,7 +4,6 @@ using UnityEngine;
 public static class K
 {
     public const string slot = "Slot";
-    public const string connector = "Connector";
 
     public static class ColorKey
     {

@@ -28,25 +28,6 @@ public class GridControl : MonoBehaviour
         CreateGrid(4);
     }
 
-    private IEnumerator Start()
-    {
-        yield return null;
-
-        foreach (GameObject childObject in slotObjects)
-        {
-            Vector2 slotSize = childObject.GetComponent<RectTransform>().sizeDelta;
-
-            foreach (Transform child in childObject.transform)
-            {
-                if (child.gameObject.tag.Equals(K.slot))
-                {
-                    child.gameObject.GetComponent<RectTransform>().sizeDelta =
-                        new Vector2(slotSize.x / 2, slotSize.y / 2);
-                }
-            }
-        }
-    }
-
     private void CreateGrid(int size)
     {
         level = fileManager.ReadLevel(size);
@@ -93,7 +74,7 @@ public class GridControl : MonoBehaviour
 
                 if (groupNumber > 0)
                 {
-                    slot.isStarter = true;
+                    slot.isDrawn = true;
                     GameObject connectorObject = Instantiate(connectorPrefab, slotObject.transform);
                     connectorObject.name = $"Connector{groupNumber}";
 
