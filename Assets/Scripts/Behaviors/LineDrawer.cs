@@ -8,6 +8,7 @@ public class LineDrawer : MonoBehaviour
     [SerializeField] private GameObject linePrefab = default;
     [SerializeField] private GameObject toucherObject = default;
     [SerializeField] private GameObject uiCanvas = default;
+    [SerializeField] private GridControl gridControl = default;
 
     private GraphicRaycaster raycaster;
     private PointerEventData pointerEventData;
@@ -16,10 +17,8 @@ public class LineDrawer : MonoBehaviour
     private List<GameObject> lines = new List<GameObject>();
     private RectTransform toucherRectTransform = default;
     private CanvasGroup toucherCanvasGroup = default;
-    private Color32 currentColor = default;
     private Vector2 mousePosition = default;
     private Vector2 mousePositionStart = default;
-    private bool drawingHorizontally;
 
     private void Awake()
     {
@@ -54,7 +53,6 @@ public class LineDrawer : MonoBehaviour
                     {
                         GameObject lineObject = Instantiate(linePrefab, transform);
                         lines.Add(lineObject);
-                        currentColor = slot.color;
 
                         LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
                         lineRenderer.positionCount = 0;
@@ -86,11 +84,11 @@ public class LineDrawer : MonoBehaviour
                     if (!slot.isDrawn)
                     {
                         print($"Slot index: {slot.index}");
+                        print($"mousePosition: {mousePosition.x}, {mousePosition.y}.\n mousePositionStart: {mousePositionStart.x}, {mousePositionStart.y}");
                         RectTransform slotTransform = result.gameObject.GetComponent<RectTransform>();
                         LineRenderer lineRenderer = lines[lines.Count - 1].GetComponent<LineRenderer>();
                         RectTransform initTransform = lines[lines.Count - 1].GetComponent<Line>().rectTransform;
 
-                        print($"mousePosition: {mousePosition.x}, {mousePosition.y}.\n mousePositionStart: {mousePositionStart.x}, {mousePositionStart.y}");
                         if (mousePosition.y < mousePositionStart.y) // Down
                         {
                             lineRenderer.SetPosition(lineRenderer.positionCount++,
@@ -98,14 +96,9 @@ public class LineDrawer : MonoBehaviour
 
                             slot.isDrawn = true;
                             slot.color = lineRenderer.endColor;
-                            drawingHorizontally = false;
                         }
                         else if (mousePosition.x < mousePositionStart.x) // Left
                         {
-                            if (!drawingHorizontally)
-                            {
-
-                            }
                             lineRenderer.SetPosition(lineRenderer.positionCount++,
                                 new Vector3(slotTransform.position.x, initTransform.position.y, 0));
 

@@ -7,13 +7,13 @@ public class GridControl : MonoBehaviour
 {
     [SerializeField] private GameObject slotPrefab = default;
     [SerializeField] private GameObject connectorPrefab = default;
+    [SerializeField] private GameObject[] slotObjects;
     [Header("Editor")]
-    [SerializeField] private bool isPortrait; // TODO: Temp for editor
+    [Tooltip("Used within Editor only")]
+    [SerializeField] private bool isPortrait;
 
-    private GameObject[] slotObjects;
     private GridLayoutGroup gridLayout = default;
     private FileManager fileManager;
-    private float width, height;
     private int[,] level;
     private Dictionary<int, Color32> colorGroup = new Dictionary<int, Color32>();
 
@@ -22,14 +22,12 @@ public class GridControl : MonoBehaviour
         gridLayout = GetComponent<GridLayoutGroup>();
         fileManager = new FileManager();
 
-        width = Screen.width;
-        height = Screen.height;
-
-        CreateGrid(4);
+        CreateGrid();
     }
 
-    private void CreateGrid(int size)
+    private void CreateGrid()
     {
+        int size = 4; // TODO: Determine randomly or get from a user
         level = fileManager.ReadLevel(size);
 
         int cellsCount = (int)Mathf.Pow(size, 2);
@@ -39,15 +37,15 @@ public class GridControl : MonoBehaviour
 
         float cellSize;
 #if UNITY_EDITOR
-        cellSize = ((isPortrait ? width : height) / size) - (size * 10);
+        cellSize = ((isPortrait ? Screen.width : Screen.height) / size) - (size * 10);
 #else
         if (Screen.orientation == ScreenOrientation.Portrait)
         {
-            cellSize = (width / size) - (size * 10);
+            cellSize = (Screen.width / size) - (size * 10);
         }
         else
         {
-            cellSize = (height / size) - (size * 10);
+            cellSize = (Screen.height / size) - (size * 10);
         }
 #endif
 

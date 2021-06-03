@@ -448,6 +448,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   slotPrefab: {fileID: 2330821733259478429, guid: eb47356bd286f4c7f8649f2dd3dd21ee, type: 3}
   connectorPrefab: {fileID: 507358924660987636, guid: f0de1f28e43104bc5afced26036f4a77, type: 3}
+  slotObjects: []
   isPortrait: 1
 --- !u!1 &1881551387
 GameObject:
@@ -495,6 +496,7 @@ MonoBehaviour:
   linePrefab: {fileID: 1340383666361829270, guid: 2ee083b78a66e4113b2827c3d7aaf8cd, type: 3}
   toucherObject: {fileID: 507358923404407048}
   uiCanvas: {fileID: 1310461286}
+  gridControl: {fileID: 1753000528}
 --- !u!1 &507358923404407048
 GameObject:
   m_ObjectHideFlags: 0
